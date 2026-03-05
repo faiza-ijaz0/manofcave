@@ -157,13 +157,13 @@ export default function CustomerLogin() {
           <div className="text-center mb-10">
             {/* Pink Accent Line - #FA9DB7 */}
             <div className="flex justify-center mb-5">
-              <div className="w-20 h-1 bg-[#FA9DB7] rounded-full"></div>
+              <div className="w-20 h-1 bg-secondary rounded-full"></div>
             </div>
             
             {/* Customer Portal Badge - Gray */}
             <div className="inline-block mb-4">
               <span className="inline-flex items-center px-5 py-2 rounded-full bg-gray-100 border border-gray-200 shadow-sm">
-                <Sparkles className="w-3.5 h-3.5 mr-2 text-[#FA9DB7]" />
+                <Sparkles className="w-3.5 h-3.5 mr-2 text-secondary" />
                 <span className="text-gray-700 font-medium tracking-[0.2em] uppercase text-[10px]">
                   CUSTOMER PORTAL
                 </span>
@@ -172,9 +172,8 @@ export default function CustomerLogin() {
             
             {/* Brand Name - #FA9DB7 Pink */}
             <h1 className="text-4xl md:text-5xl font-serif font-bold mb-3">
-              <span className="text-[#FA9DB7] italic drop-shadow-sm">
-                Jam Beauty Lounge
-              </span>
+              <span className="text-secondary italic drop-shadow-sm">
+Manofcave              </span>
             </h1>
             
             {/* Subtitle - Gray */}
@@ -187,19 +186,19 @@ export default function CustomerLogin() {
           <Card className="border border-gray-200 bg-white shadow-xl shadow-gray-200/50 hover:shadow-2xl hover:shadow-[#FA9DB7]/20 transition-all duration-500 rounded-3xl overflow-hidden">
             
             {/* Pink Top Border - #FA9DB7 */}
-            <div className="h-1.5 w-full bg-[#FA9DB7]"></div>
+            <div className="h-1.5 w-full bg-secondary"></div>
             
             <Tabs defaultValue="login" className="w-full">
               <TabsList className="grid w-full grid-cols-2 bg-gray-100 p-1.5 rounded-none border-b border-gray-200">
                 <TabsTrigger 
                   value="login" 
-                  className="rounded-xl font-semibold text-xs tracking-[0.15em] uppercase py-3 data-[state=active]:bg-[#FA9DB7] data-[state=active]:text-white data-[state=active]:shadow-md text-gray-600 hover:text-gray-900 transition-all"
+                  className="rounded-xl font-semibold text-xs tracking-[0.15em] uppercase py-3 data-[state=active]:bg-secondary data-[state=active]:text-white data-[state=active]:shadow-md text-gray-600 hover:text-gray-900 transition-all"
                 >
                   Sign In
                 </TabsTrigger>
                 <TabsTrigger 
                   value="register" 
-                  className="rounded-xl font-semibold text-xs tracking-[0.15em] uppercase py-3 data-[state=active]:bg-[#FA9DB7] data-[state=active]:text-white data-[state=active]:shadow-md text-gray-600 hover:text-gray-900 transition-all"
+                  className="rounded-xl font-semibold text-xs tracking-[0.15em] uppercase py-3 data-[state=active]:bg-secondary data-[state=active]:text-white data-[state=active]:shadow-md text-gray-600 hover:text-gray-900 transition-all"
                 >
                   Register
                 </TabsTrigger>
@@ -274,10 +273,10 @@ export default function CustomerLogin() {
 
                     <Button 
                       type="submit" 
-                      className="relative w-full h-14 bg-[#FA9DB7] hover:bg-[#E87A9B] text-white font-semibold tracking-[0.15em] text-xs rounded-2xl transition-all duration-500 shadow-md shadow-[#FA9DB7]/30 hover:shadow-lg hover:shadow-[#FA9DB7]/40 hover:-translate-y-0.5 overflow-hidden group"
+                      className="relative w-full h-14 bg-secondary hover:bg-secondary text-white font-semibold tracking-[0.15em] text-xs rounded-2xl transition-all duration-500 shadow-md shadow-[#FA9DB7]/30 hover:shadow-lg hover:shadow-[#FA9DB7]/40 hover:-translate-y-0.5 overflow-hidden group"
                       disabled={isLoading}
                     >
-                      <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></span>
+                      <span className="absolute inset-0 w-full h-full bg-secondary to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></span>
                       {isLoading ? 'SIGNING IN...' : 'SIGN IN'}
                       <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                     </Button>
@@ -286,12 +285,12 @@ export default function CustomerLogin() {
                   <div className="mt-6 pt-6 border-t border-gray-100 text-center">
                     <p className="text-gray-500 text-sm">
                       Don't have an account?{' '}
-                      <Link href="#register" className="text-[#FA9DB7] font-semibold hover:text-[#E87A9B] transition-colors">
+                      <Link href="#register" className="text-secondary font-semibold hover:text-[#E87A9B] transition-colors">
                         Register here
                       </Link>
                     </p>
                     <div className="mt-3">
-                      <Link href="/" className="text-gray-400 hover:text-[#FA9DB7] text-sm flex items-center justify-center gap-2 transition-colors">
+                      <Link href="/" className="text-gray-400 hover:text-secondary text-sm flex items-center justify-center gap-2 transition-colors">
                         ← Back to Home
                       </Link>
                     </div>
@@ -422,7 +421,7 @@ export default function CustomerLogin() {
 
                     <Button 
                       type="submit" 
-                      className="relative w-full h-14 bg-[#FA9DB7] hover:bg-[#E87A9B] text-white font-semibold tracking-[0.15em] text-xs rounded-2xl transition-all duration-500 shadow-md shadow-[#FA9DB7]/30 hover:shadow-lg hover:shadow-[#FA9DB7]/40 hover:-translate-y-0.5 overflow-hidden group"
+                      className="relative w-full h-14 bg-secondary text-white font-semibold tracking-[0.15em] text-xs rounded-2xl transition-all duration-500 shadow-md shadow-[#FA9DB7]/30 hover:shadow-lg hover:shadow-[#FA9DB7]/40 hover:-translate-y-0.5 overflow-hidden group"
                       disabled={isLoading}
                     >
                       <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></span>
@@ -440,7 +439,7 @@ export default function CustomerLogin() {
           {/* Footer Note - Gray */}
           <div className="text-center mt-8">
             <p className="text-gray-400 text-xs">
-              © 2026 Jam Beauty Lounge. All rights reserved.
+              © 2026 manofcave. All rights reserved.
             </p>
           </div>
         </div>
