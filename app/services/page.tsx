@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Scissors, Star, Clock, Search, Filter, Check, ShoppingCart, ChevronRight, Sparkles, Plus, X, Calendar, Users, MapPin, Award, Info, DollarSign, TrendingUp, Package, Shield, MessageCircle, Phone, Mail, Navigation, Share2, Loader2, RefreshCw, Building, CreditCard, Tag, Hash, CalendarClock } from 'lucide-react';
+import { Scissors, Star, Clock, Search, Filter, Check, ShoppingCart, ChevronRight, Sparkles, Plus, X, Calendar, Users, MapPin, Award, Info, DollarSign, TrendingUp, Package, Shield, MessageCircle, Phone, Mail, Navigation, Share2, Loader2, RefreshCw, Building, CreditCard, Tag, Hash, CalendarClock, ImageOff } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { create } from 'zustand';
 import { 
@@ -348,6 +348,56 @@ const formatDate = (timestamp: any) => {
   } catch (error) {
     return 'Invalid Date';
   }
+};
+
+// Image fallback URLs array - multiple fallbacks for different services
+const FALLBACK_IMAGES = [
+  'https://images.unsplash.com/photo-1599351431247-f5094021186d?q=80&w=2070&auto=format&fit=crop', // Barber cutting hair
+  'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=2070&auto=format&fit=crop', // Barber tools
+  'https://images.unsplash.com/photo-1512690196222-7c7d3f993c1b?q=80&w=2070&auto=format&fit=crop', // Products
+  'https://images.unsplash.com/photo-1562322140-8baeececf3df?q=80&w=2069&auto=format&fit=crop', // Salon interior
+  'https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?q=80&w=2070&auto=format&fit=crop', // Hair styling
+  'https://images.unsplash.com/photo-1621605815971-fbc98d665033?q=80&w=2070&auto=format&fit=crop', // Modern barber
+];
+
+// Image component with error handling
+const ServiceImage = ({ src, alt, className }: { src: string; alt: string; className: string }) => {
+  const [imgSrc, setImgSrc] = useState<string>(src);
+  const [error, setError] = useState<boolean>(false);
+  const [fallbackIndex, setFallbackIndex] = useState<number>(0);
+
+  const handleError = () => {
+    if (fallbackIndex < FALLBACK_IMAGES.length - 1) {
+      // Try next fallback image
+      const nextIndex = fallbackIndex + 1;
+      setFallbackIndex(nextIndex);
+      setImgSrc(FALLBACK_IMAGES[nextIndex]);
+    } else {
+      // All fallbacks failed, show error state
+      setError(true);
+    }
+  };
+
+  if (error) {
+    return (
+      <div className={`${className} bg-gray-100 flex items-center justify-center`}>
+        <div className="text-center">
+          <ImageOff className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+          <p className="text-xs text-gray-500">Image not available</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <img 
+      src={imgSrc} 
+      alt={alt}
+      className={className}
+      onError={handleError}
+      loading="lazy"
+    />
+  );
 };
 
 // Main Component
@@ -917,15 +967,12 @@ export default function ServicesPage() {
                     key={service.id} 
                     className="group border border-gray-100 bg-white shadow-sm hover:shadow-md transition-all duration-500 rounded-lg overflow-hidden flex flex-col hover:border-secondary/20 h-full"
                   >
-                    {/* Service Image - Further Compressed */}
-                    <div className="relative aspect-[3/2] overflow-hidden">
-                      <img 
+                    {/* Service Image - Using custom ServiceImage component */}
+                    <div className="relative aspect-[3/2] overflow-hidden bg-gray-100">
+                      <ServiceImage 
                         src={service.imageUrl} 
-                        alt={service.name} 
+                        alt={service.name}
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                        onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
-                          e.currentTarget.src = 'https://images.unsplash.com/photo-1599351431247-f5094021186d?q=80&w=2070&auto=format&fit=crop';
-                        }}
                       />
                       
                       {/* Category Badge - Now on Image */}
@@ -949,8 +996,6 @@ export default function ServicesPage() {
                           {service.duration}min
                         </div>
                       </div>
-
-                      
                     </div>
 
                     {/* Card Content - Minimal */}
@@ -1058,9 +1103,9 @@ export default function ServicesPage() {
           Detailed information about {selectedService.name} service
         </SheetDescription>
         
-        {/* Header with Image */}
-        <div className="relative h-64 w-full">
-          <img 
+        {/* Header with Image - Using ServiceImage component */}
+        <div className="relative h-64 w-full bg-gray-100">
+          <ServiceImage 
             src={selectedService.imageUrl} 
             alt={selectedService.name}
             className="w-full h-full object-cover"
@@ -1157,11 +1202,6 @@ export default function ServicesPage() {
             </div>
           )}
 
-
-         
-
-        
-
           {/* Action Buttons */}
           <div className="grid grid-cols-2 gap-3 pt-4 border-t">
             {isServiceInCart(selectedService.id) ? (
@@ -1193,12 +1233,6 @@ export default function ServicesPage() {
                 )}
               </Button>
             )}
-            
-           
-            
-            
-            
-            
           </div>
         </div>
       </>
