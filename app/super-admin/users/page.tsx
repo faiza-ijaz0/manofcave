@@ -636,7 +636,7 @@ export default function SuperAdminUsers() {
       resetForm();
 
       alert(
-        `✅ AED{formData.role === "super_admin" ? "Super Admin" : formData.role} user "AED{formData.name}" added successfully!`,
+      "added successfully"
       );
     } catch (error: any) {
       console.error("Error adding user: ", error);

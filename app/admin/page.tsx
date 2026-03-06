@@ -1394,23 +1394,17 @@ export default function SuperAdminDashboard() {
       `}</style>
 
     <div className="flex h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100/50 overflow-hidden">
-      {/* Sidebar */}
-      <AdminSidebar
-        role={user?.role === "super_admin" ? "super_admin" : "branch_admin"}
-        onLogout={handleLogout}
-        isOpen={sidebarOpen}
-        onToggle={() => setSidebarOpen(!sidebarOpen)}
-      />
+      
 
       {/* Main Content */}
-      <div
-        className={cn(
-          "flex-1 flex flex-col transition-all duration-300 ease-in-out overflow-hidden",
-          sidebarOpen ? "lg:ml-0" : "lg:ml-0",
-        )}
-      >
+            <div
+              className={cn(
+                "flex-1 flex flex-col w-full transition-all duration-300 ease-in-out overflow-hidden",
+                sidebarOpen ? "lg:ml-0" : "lg:ml-0",
+              )}
+            >
         {/* Modern Header */}
-        <header className="bg-gradient-to-r from-[#FA9DB7] via-[#FA9DB7]/95 to-[#B84A68]/90 shadow-lg shadow-[#FA9DB7]/20 border-b border-[#FA9DB7]/30 shrink-0">
+        <header className="bg-black shadow-lg shadow-[#FA9DB7]/20 border-b border-[#FA9DB7]/30 shrink-0">
           <div className="flex items-center justify-between px-1 py-1">
             <div className="flex items-center gap-4">
               <AdminMobileSidebar
@@ -1562,7 +1556,7 @@ export default function SuperAdminDashboard() {
               {/* User Profile */}
               <div className="flex items-center gap-3 bg-white/10 px-4 py-2.5 rounded-2xl backdrop-blur-sm hover:bg-white/20 transition-colors cursor-pointer">
                 <Avatar className="h-10 w-10 border-2 border-white/30">
-                  <AvatarFallback className="bg-gradient-to-r from-[#FA9DB7] to-[#B84A68] text-white font-bold">
+                  <AvatarFallback className="bg-secondary text-white font-bold">
                     {user?.email?.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
