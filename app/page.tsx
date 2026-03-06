@@ -11,7 +11,7 @@ import {
   TrendingUp, Package, DollarSign, RefreshCw,
   Crown, Gem, Shield, Sparkles, Check, UserCheck,
   Grid3X3,
-  Facebook
+  Facebook, ImageOff
 } from "lucide-react";
 import { Header } from "@/components/shared/Header";
 import Link from "next/link";
@@ -36,6 +36,102 @@ import {
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useBranchStore } from '@/stores/branchStore';
+
+// ==================== IMAGE FALLBACK CONFIGURATION ====================
+const FALLBACK_IMAGES = {
+  service: 'https://images.unsplash.com/photo-1599351431247-f5094021186d?q=80&w=2070&auto=format&fit=crop',
+  product: 'https://images.unsplash.com/photo-1512690196222-7c7d3f993c1b?q=80&w=2070&auto=format&fit=crop',
+  category: 'https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?q=80&w=2070&auto=format&fit=crop',
+  offer: 'https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?q=80&w=2070&auto=format&fit=crop',
+  staff: '/default-avatar.png',
+  hero: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=2070&auto=format&fit=crop',
+  cta: 'https://images.unsplash.com/photo-1512690196222-7c7d3f993c1b?q=80&w=2070&auto=format&fit=crop',
+};
+
+// Image component with error handling
+const ImageWithFallback = ({ 
+  src, 
+  alt, 
+  className, 
+  fallbackType = 'service',
+  objectFit = 'cover'
+}: { 
+  src: string; 
+  alt: string; 
+  className: string; 
+  fallbackType?: keyof typeof FALLBACK_IMAGES;
+  objectFit?: 'cover' | 'contain';
+}) => {
+  const [imgSrc, setImgSrc] = useState<string>(src);
+  const [error, setError] = useState<boolean>(false);
+  const [fallbackIndex, setFallbackIndex] = useState<number>(0);
+
+  // Multiple fallback options for each type
+  const getFallbackChain = (type: keyof typeof FALLBACK_IMAGES) => {
+    switch(type) {
+      case 'service':
+        return [
+          FALLBACK_IMAGES.service,
+          'https://images.unsplash.com/photo-1585747860715-2ba37e788b70?q=80&w=2074&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1621605815971-fbc98d665033?q=80&w=2070&auto=format&fit=crop',
+        ];
+      case 'product':
+        return [
+          FALLBACK_IMAGES.product,
+          'https://images.unsplash.com/photo-1596704017254-9755b64a9c60?q=80&w=2070&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1596464716127-f2a82984de30?q=80&w=2070&auto=format&fit=crop',
+        ];
+      case 'category':
+        return [
+          FALLBACK_IMAGES.category,
+          'https://images.unsplash.com/photo-1559599101-f09722fb4948?q=80&w=2069&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?q=80&w=2070&auto=format&fit=crop',
+        ];
+      case 'staff':
+        return [
+          '/default-avatar.png',
+          'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1974&auto=format&fit=crop',
+        ];
+      default:
+        return [FALLBACK_IMAGES[type]];
+    }
+  };
+
+  const fallbackChain = getFallbackChain(fallbackType);
+
+  const handleError = () => {
+    if (fallbackIndex < fallbackChain.length - 1) {
+      // Try next fallback image
+      const nextIndex = fallbackIndex + 1;
+      setFallbackIndex(nextIndex);
+      setImgSrc(fallbackChain[nextIndex]);
+    } else {
+      // All fallbacks failed, show error state
+      setError(true);
+    }
+  };
+
+  if (error) {
+    return (
+      <div className={`${className} bg-gray-100 flex items-center justify-center`}>
+        <div className="text-center">
+          <ImageOff className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+          <p className="text-xs text-gray-500">Image not available</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <img 
+      src={imgSrc} 
+      alt={alt}
+      className={`${className} object-${objectFit}`}
+      onError={handleError}
+      loading="lazy"
+    />
+  );
+};
 
 // ==================== STORE DEFINITION ====================
 interface Service {
@@ -255,7 +351,7 @@ const useHomeStore = create<HomeStore>()(
               duration: Number(data.duration) || 30,
               category: data.category || 'Uncategorized',
               categoryId: data.categoryId || '',
-              imageUrl: data.imageUrl || 'https://images.unsplash.com/photo-1599351431247-f5094021186d?q=80&w=2070&auto=format&fit=crop',
+              imageUrl: data.imageUrl || FALLBACK_IMAGES.service,
               branchNames: Array.isArray(data.branchNames) ? data.branchNames : [],
               branches: Array.isArray(data.branches) ? data.branches : [],
               popularity: data.popularity || 'medium',
@@ -288,7 +384,7 @@ const useHomeStore = create<HomeStore>()(
               cost: Number(data.cost) || 0,
               category: data.category || 'Uncategorized',
               categoryId: data.categoryId || '',
-              imageUrl: data.imageUrl || 'https://images.unsplash.com/photo-1512690196222-7c7d3f993c1b?q=80&w=2070&auto=format&fit=crop',
+              imageUrl: data.imageUrl || FALLBACK_IMAGES.product,
               sku: data.sku || 'N/A',
               rating: Number(data.rating) || 0,
               reviews: Number(data.reviews) || 0,
@@ -319,7 +415,7 @@ const useHomeStore = create<HomeStore>()(
             staffData.push({
               id: doc.id,
               name: data.name || 'Unknown Staff',
-              image: data.imageUrl || data.avatar || data.photoURL || '/default-avatar.png',
+              image: data.imageUrl || data.avatar || data.photoURL || FALLBACK_IMAGES.staff,
               role: data.role || data.position || 'Barber',
               rating: Number(data.rating) || 4.5,
               reviews: Number(data.reviews) || 0,
@@ -390,7 +486,7 @@ const useHomeStore = create<HomeStore>()(
                 description: data.description || 'Limited time offer',
                 discountType: data.discountType || 'percentage',
                 discountValue: Number(data.discountValue) || 0,
-                imageUrl: data.imageUrl || 'https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?q=80&w=2070&auto=format&fit=crop',
+                imageUrl: data.imageUrl || FALLBACK_IMAGES.offer,
                 offerType: data.offerType || 'service',
                 applicableProducts: Array.isArray(data.applicableProducts) ? data.applicableProducts : [],
                 applicableServices: Array.isArray(data.applicableServices) ? data.applicableServices : [],
@@ -474,7 +570,7 @@ const useHomeStore = create<HomeStore>()(
               id: doc.id,
               name: data.name || 'Unnamed Category',
               description: data.description || 'No description available',
-              image: data.image || 'https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?q=80&w=2070&auto=format&fit=crop',
+              image: data.image || FALLBACK_IMAGES.category,
               branchId: data.branchId || '',
               branchName: data.branchName || 'Unknown Branch',
               branchCity: data.branchCity || 'Unknown City',
@@ -509,7 +605,7 @@ const useHomeStore = create<HomeStore>()(
       },
     }),
     {
-      name: 'home-storage', // unique name for localStorage
+      name: 'home-storage',
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         services: state.services,
@@ -850,7 +946,7 @@ export default function Home() {
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat scale-105 animate-slow-zoom"
           style={{ 
-            backgroundImage: "url('https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=2070&auto=format&fit=crop')",
+            backgroundImage: `url('${FALLBACK_IMAGES.hero}')`,
           }}
         >
           <div className="absolute inset-0 bg-linear-to-b from-black/70 via-black/40 to-black/70 backdrop-blur-[2px]"></div>
@@ -1009,13 +1105,11 @@ export default function Home() {
                 <div className="group relative cursor-pointer overflow-hidden rounded-2xl shadow-md hover:shadow-xl transition-all duration-300">
                   {/* Image Container - Fixed aspect ratio */}
                   <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100">
-                    <img 
+                    <ImageWithFallback 
                       src={category.image} 
                       alt={category.name}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?q=80&w=2070&auto=format&fit=crop';
-                      }}
+                      className="w-full h-full transition-transform duration-500 group-hover:scale-110"
+                      fallbackType="category"
                     />
                     
                     {/* Dark Overlay on Hover */}
@@ -1101,13 +1195,11 @@ export default function Home() {
               <div className="group relative bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300">
                 {/* Image Container */}
                 <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100">
-                  <img 
+                  <ImageWithFallback 
                     src={service.imageUrl} 
                     alt={service.name}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1599351431247-f5094021186d?q=80&w=2070&auto=format&fit=crop';
-                    }}
+                    className="w-full h-full transition-transform duration-500 group-hover:scale-110"
+                    fallbackType="service"
                   />
                   
                   {/* Dark Overlay on Hover */}
@@ -1177,6 +1269,7 @@ export default function Home() {
     )}
   </div>
 </section>
+     
      {/* Products Section */}
 <section className="py-20 px-4 bg-[#0f0f0f] text-white relative overflow-hidden">
   <div className="absolute top-0 right-0 w-1/2 h-full bg-secondary/5 blur-[150px] pointer-events-none"></div>
@@ -1227,13 +1320,11 @@ export default function Home() {
             <CarouselItem key={product.id} className="pl-5 md:basis-1/2 lg:basis-1/4">
               <div className="group cursor-pointer bg-white/[0.03] p-5 border border-white/10 rounded-2xl hover:bg-white/[0.07] hover:border-secondary/50 transition-all duration-500 h-full">
                 <div className="relative aspect-square overflow-hidden mb-4 rounded-xl bg-white/5">
-                  <img 
-                    src={product.imageUrl || "https://images.unsplash.com/photo-1512690196222-7c7d3f993c1b?q=80&w=2070&auto=format&fit=crop"} 
+                  <ImageWithFallback 
+                    src={product.imageUrl} 
                     alt={product.name} 
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
-                      e.currentTarget.src = 'https://images.unsplash.com/photo-1512690196222-7c7d3f993c1b?q=80&w=2070&auto=format&fit=crop';
-                    }}
+                    className="w-full h-full transition-transform duration-700 group-hover:scale-110"
+                    fallbackType="product"
                   />
                   {product.totalStock <= 5 && (
                     <div className="absolute top-3 left-3 bg-secondary text-primary px-2 py-0.5 rounded-full text-[8px] font-black tracking-widest uppercase shadow-lg">
@@ -1361,13 +1452,11 @@ export default function Home() {
                   
                   {offer.imageUrl && (
                     <div className="absolute inset-0 opacity-20">
-                      <img 
+                      <ImageWithFallback 
                         src={offer.imageUrl} 
                         alt={offer.title}
                         className="w-full h-full object-cover"
-                        onError={(e) => {
-                          e.currentTarget.style.display = 'none';
-                        }}
+                        fallbackType="offer"
                       />
                     </div>
                   )}
@@ -1603,7 +1692,6 @@ export default function Home() {
         Our barbers are more than just stylists; they are highly trained artisans dedicated to the perfection of their craft.
       </p>
       <div className="flex items-center justify-center gap-2 mt-4">
-        
         {selectedBranch !== 'all' && (
           <Badge className="bg-secondary/10 text-secondary border-secondary/30">
             <Building className="w-3 h-3 mr-1" />
@@ -1632,14 +1720,12 @@ export default function Home() {
             <CarouselItem key={member.id} className="pl-6 md:basis-1/2 lg:basis-1/4">
               <div className="group relative cursor-pointer">
                 {/* Image Container */}
-                <div className="relative aspect-[3/4] overflow-hidden rounded-[2rem] shadow-xl">
-                  <img 
+                <div className="relative aspect-[3/4] overflow-hidden rounded-[2rem] shadow-xl bg-gray-100">
+                  <ImageWithFallback 
                     src={member.image} 
                     alt={member.name}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
-                      e.currentTarget.src = '/default-avatar.png';
-                    }}
+                    className="w-full h-full transition-transform duration-700 group-hover:scale-110"
+                    fallbackType="staff"
                   />
                   
                   {/* Dark Gradient Overlay */}
@@ -1673,8 +1759,6 @@ export default function Home() {
                       </span>
                     </div>
                   </div>
-                  
-                 
                 </div>
               </div>
             </CarouselItem>
@@ -1704,7 +1788,6 @@ export default function Home() {
           Luxury Grooming, <br /><span className="text-secondary italic">Everywhere.</span>
         </h2>
         <div className="flex items-center gap-2">
-         
           {selectedBranch !== 'all' && (
             <Badge className="bg-secondary/10 text-secondary border-secondary/30">
               <Building className="w-3 h-3 mr-1" />
@@ -1870,7 +1953,7 @@ export default function Home() {
       <section className="relative py-40 px-4 overflow-hidden">
         <div 
           className="absolute inset-0 bg-cover bg-fixed bg-center scale-110"
-          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1512690196222-7c7d3f993c1b?q=80&w=2070&auto=format&fit=crop')" }}
+          style={{ backgroundImage: `url('${FALLBACK_IMAGES.cta}')` }}
         >
           <div className="absolute inset-0 bg-linear-to-b from-primary/95 via-primary/80 to-primary/95"></div>
         </div>
@@ -1961,7 +2044,6 @@ export default function Home() {
                   { label: 'Total Products', value: stats.totalProducts },
                   { label: 'Active Staff', value: stats.totalStaff },
                   { label: 'Active Branches', value: stats.totalBranches },
-                 
                 ].map((item) => (
                   <li key={item.label} className="flex justify-between items-center border-b border-white/5 pb-3">
                     <span className="font-light">{item.label}</span>
